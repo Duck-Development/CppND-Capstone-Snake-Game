@@ -2,11 +2,13 @@
 #include <iostream>
 #include "SDL.h"
 
-Game::Game(std::size_t grid_width, std::size_t grid_height)
-    : snake(grid_width, grid_height),
+Game::Game(std::size_t grid_width, std::size_t grid_height):
       engine(dev()),
       random_w(0, static_cast<int>(grid_width - 1)),
       random_h(0, static_cast<int>(grid_height - 1)) {
+
+  snakes.emplace_back( Snake(grid_width, grid_height,  random_w(engine) , random_h(engine)));
+  snakes.emplace_back( Snake(grid_width, grid_height,  random_w(engine) , random_h(engine)));
   PlaceFood();
 }
 
@@ -23,9 +25,10 @@ void Game::Run(Controller const &controller, Renderer &renderer,
     frame_start = SDL_GetTicks();
 
     // Input, Update, Render - the main game loop.
-    controller.HandleInput(running, snake);
+    controller.HandleInput(running, snakes);
     Update();
-    renderer.Render(snake, food);
+
+    renderer.Render(snakes, food);
 
     frame_end = SDL_GetTicks();
 
@@ -57,7 +60,7 @@ void Game::PlaceFood() {
     y = random_h(engine);
     // Check that the location is not occupied by a snake item before placing
     // food.
-    if (!snake.SnakeCell(x, y)) {
+    if (!snakes[0].SnakeCell(x, y) && !snakes[1].SnakeCell(x, y)) {
       food.x = x;
       food.y = y;
       return;
@@ -66,22 +69,56 @@ void Game::PlaceFood() {
 }
 
 void Game::Update() {
-  if (!snake.alive) return;
+  if (!snakes[0].IsAlive() || !snakes[1].IsAlive() ) return;
 
-  snake.Update();
+  snakes[0].Update();
+  snakes[1].Update();
 
-  int new_x = static_cast<int>(snake.head_x);
-  int new_y = static_cast<int>(snake.head_y);
+  auto&& newHead0 = snakes[0].GetHead();
 
   // Check if there's food over here
-  if (food.x == new_x && food.y == new_y) {
+  if (food.x == newHead0.x && food.y == newHead0.y) {
     score++;
     PlaceFood();
     // Grow snake and increase speed.
-    snake.GrowBody();
-    snake.speed += 0.02;
+    snakes[0].GrowBody();
+    snakes[0].IncreaseSpeed(0.02);
   }
+  
+  auto&& newHead1 = snakes[1].GetHead();
+
+  // Check if there's food over here
+  if (food.x == newHead1.x && food.y == newHead1.y) {
+    score++;
+    PlaceFood();
+    // Grow snake and increase speed.
+    snakes[1].GrowBody();
+    snakes[1].IncreaseSpeed(0.02);
+  }
+
+// Snake Colision
+if (newHead0.x == newHead1.x && newHead0.y == newHead1.y)
+{
+  snakes[0].Colide();
+  snakes[1].Colide();
+  return;
+}
+
+if (snakes[0].SnakeCell(newHead1.x ,newHead1.y))
+{
+  snakes[1].Colide();
+  return;
+}
+
+if (snakes[1].SnakeCell(newHead0.x ,newHead0.y))
+{
+  snakes[0].Colide();
+  return;
+}
+
+
+
 }
 
 int Game::GetScore() const { return score; }
-int Game::GetSize() const { return snake.size; }
+int Game::GetSize() const { return snakes[0].GetSize()+snakes[1].GetSize(); }
