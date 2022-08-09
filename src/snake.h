@@ -30,6 +30,11 @@ class Snake {
   void SetDir(Direction dir);
   Direction GetDir() ;
   void Colide();
+  void operator()()
+  {
+       Update();
+  }
+
   
  private:
   void UpdateHead();
