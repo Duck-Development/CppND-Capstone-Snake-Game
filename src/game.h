@@ -7,6 +7,7 @@
 #include "renderer.h"
 #include "snake.h"
 #include <vector>
+#include <memory>
 class Game {
  public:
   Game(std::size_t grid_width, std::size_t grid_height);
@@ -16,7 +17,7 @@ class Game {
   int GetSize() const;
 
  private:
-  std::vector<Snake> snakes;
+  std::vector<std::shared_ptr<Snake>> snakes;
   SDL_Point food;
 
   std::random_device dev;

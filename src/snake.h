@@ -4,6 +4,7 @@
 #include <vector>
 #include "SDL.h"
 #include <deque>
+#include <mutex>
 
 class Snake {
  public:
@@ -19,15 +20,17 @@ class Snake {
 
   void Update();
   void GrowBody();
+  SDL_Point GetHead()  ;
+  std::deque<SDL_Point>  GetBody();
   bool SnakeCell(int x, int y);
-  std::deque<SDL_Point> body;
-  void IncreaseSpeed(double _speed){speed += _speed;};
-  bool const  IsAlive() const {return alive;};
-  int const GetSize() const {return size;};
-  SDL_Point GetHead() const ;
-  void SetDir(Direction dir){direction = dir;}
-  Direction GetDir() const {return direction;}
-  void Colide(){alive = false;};
+  
+  void IncreaseSpeed(double _speed);
+  bool const  IsAlive();
+  int const GetSize();
+  void SetDir(Direction dir);
+  Direction GetDir() ;
+  void Colide();
+  
  private:
   void UpdateHead();
   void UpdateBody(const SDL_Point &&current_cell, SDL_Point &&prev_cell);
@@ -39,7 +42,11 @@ class Snake {
   int size{1};
   float head_x;
   float head_y;
+  std::mutex _mtx;
   Direction direction = Direction::kUp;
+  std::deque<SDL_Point> body;
+  
+  
 };
 
 #endif

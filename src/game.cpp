@@ -7,8 +7,8 @@ Game::Game(std::size_t grid_width, std::size_t grid_height):
       random_w(0, static_cast<int>(grid_width - 1)),
       random_h(0, static_cast<int>(grid_height - 1)) {
 
-  snakes.emplace_back( Snake(grid_width, grid_height,  random_w(engine) , random_h(engine)));
-  snakes.emplace_back( Snake(grid_width, grid_height,  random_w(engine) , random_h(engine)));
+  snakes.emplace_back( std::make_shared<Snake>(grid_width, grid_height,  random_w(engine) , random_h(engine)));
+  snakes.emplace_back( std::make_shared<Snake>(grid_width, grid_height,  random_w(engine) , random_h(engine)));
   PlaceFood();
 }
 
@@ -60,7 +60,7 @@ void Game::PlaceFood() {
     y = random_h(engine);
     // Check that the location is not occupied by a snake item before placing
     // food.
-    if (!snakes[0].SnakeCell(x, y) && !snakes[1].SnakeCell(x, y)) {
+    if (!snakes[0]->SnakeCell(x, y) && !snakes[1]->SnakeCell(x, y)) {
       food.x = x;
       food.y = y;
       return;
@@ -69,56 +69,54 @@ void Game::PlaceFood() {
 }
 
 void Game::Update() {
-  if (!snakes[0].IsAlive() || !snakes[1].IsAlive() ) return;
+  if (!snakes[0]->IsAlive() || !snakes[1]->IsAlive() ) return;
 
-  snakes[0].Update();
-  snakes[1].Update();
+  snakes[0]->Update();
+  snakes[1]->Update();
 
-  auto&& newHead0 = snakes[0].GetHead();
+  auto&& newHead0 = snakes[0]->GetHead();
 
   // Check if there's food over here
   if (food.x == newHead0.x && food.y == newHead0.y) {
     score++;
     PlaceFood();
     // Grow snake and increase speed.
-    snakes[0].GrowBody();
-    snakes[0].IncreaseSpeed(0.02);
+    snakes[0]->GrowBody();
+    snakes[0]->IncreaseSpeed(0.02);
   }
   
-  auto&& newHead1 = snakes[1].GetHead();
+  auto&& newHead1 = snakes[1]->GetHead();
 
   // Check if there's food over here
   if (food.x == newHead1.x && food.y == newHead1.y) {
     score++;
     PlaceFood();
     // Grow snake and increase speed.
-    snakes[1].GrowBody();
-    snakes[1].IncreaseSpeed(0.02);
+    snakes[1]->GrowBody();
+    snakes[1]->IncreaseSpeed(0.02);
   }
 
 // Snake Colision
 if (newHead0.x == newHead1.x && newHead0.y == newHead1.y)
 {
-  snakes[0].Colide();
-  snakes[1].Colide();
+  snakes[0]->Colide();
+  snakes[1]->Colide();
   return;
 }
 
-if (snakes[0].SnakeCell(newHead1.x ,newHead1.y))
+if (snakes[0]->SnakeCell(newHead1.x ,newHead1.y))
 {
-  snakes[1].Colide();
+  snakes[1]->Colide();
   return;
 }
 
-if (snakes[1].SnakeCell(newHead0.x ,newHead0.y))
+if (snakes[1]->SnakeCell(newHead0.x ,newHead0.y))
 {
-  snakes[0].Colide();
+  snakes[0]->Colide();
   return;
 }
-
-
 
 }
 
 int Game::GetScore() const { return score; }
-int Game::GetSize() const { return snakes[0].GetSize()+snakes[1].GetSize(); }
+int Game::GetSize() const { return snakes[0]->GetSize()+snakes[1]->GetSize(); }
