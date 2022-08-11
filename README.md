@@ -6,7 +6,16 @@ This is a starter repo for the Capstone project in the [Udacity C++ Nanodegree P
 
 The Capstone Project gives you a chance to integrate what you've learned throughout this program. This project will become an important part of your portfolio to share with current and future colleagues and employers.
 
-In this project, you can build your own C++ application or extend this Snake game, following the principles you have learned throughout this Nanodegree Program. This project will demonstrate that you can independently create applications using a wide range of C++ features.
+This is a two Gamer Coop Snake gema. Player one uses the arrow keys and the player two uses the wasd for conntrolling snake.
+
+Used Technics 
+* The Gmae uses Async Threads for computing the Game Update for the two snakes independent.
+* The snake properties are only assesable throught getter/setter funktions
+* the snake it self is now thread able
+* to insert a new elemt to the snake the Move Semantic is used
+* helper functions return sdl strucs instead general x and y floats
+* a lambda is used for the thread.
+
 
 ## Dependencies for Running Locally
 * cmake >= 3.7
